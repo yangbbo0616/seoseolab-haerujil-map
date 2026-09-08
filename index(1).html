@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>서서연구소 | 서해안 해루질 포인트 MAP</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:Arial,'Noto Sans KR',sans-serif;background:#f4f7f9;color:#17222b}
+.wrap{max-width:900px;margin:auto;padding:18px} .hero{background:white;border-radius:20px;padding:24px;box-shadow:0 8px 24px rgba(0,0,0,.07)}
+h1{font-size:27px;margin:0 0 8px} .sub{line-height:1.6;color:#53616c}
+.notice{margin-top:16px;padding:14px;border-radius:14px;background:#fff7e6;font-size:14px;line-height:1.55}
+.panel{margin-top:16px;background:#fff;border-radius:18px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.tabs,.cities{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+button{border:1px solid #ccd6dd;background:#fff;border-radius:999px;padding:10px 15px;font-size:15px;cursor:pointer}
+button.active{background:#17222b;color:#fff;border-color:#17222b}
+select{width:100%;padding:13px;border:1px solid #ccd6dd;border-radius:12px;font-size:16px;background:#fff}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:10px 0;color:#56636c}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px} .g{background:#24a148} .y{background:#f1c21b}
+.card{margin-top:14px;border:1px solid #e0e7eb;border-radius:16px;padding:18px}
+.badge{display:inline-block;border-radius:999px;padding:6px 10px;font-size:13px;font-weight:700;margin-bottom:8px}
+.green{background:#e8f6ec;color:#147331} .yellow{background:#fff5cc;color:#7a5b00}
+.card h2{margin:4px 0 14px;font-size:23px} .row{padding:9px 0;border-bottom:1px solid #eef2f4;line-height:1.5}
+.row b{display:inline-block;min-width:105px} .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+a.btn{display:block;text-align:center;text-decoration:none;border-radius:12px;padding:13px;font-weight:700;background:#17222b;color:#fff}
+a.btn.alt{background:#edf2f5;color:#17222b}
+.safety{margin-top:16px;background:#fff;border-radius:18px;padding:18px;border-left:5px solid #d63b32;line-height:1.7}
+.small{font-size:12px;color:#697780;line-height:1.55;margin-top:14px}
+.count{font-size:13px;color:#697780;margin:8px 0}
+.step-title{
+display:flex;align-items:baseline;gap:7px;
+margin:16px 0 10px;padding:10px 12px;
+background:#f0f4f6;border-left:4px solid #17222b;
+border-radius:8px;
+}
+.step-title b{font-size:17px;color:#17222b}
+.guide{font-size:13px;color:#5f6c75;font-weight:500}
+.point-help{font-size:13px;color:#697780;line-height:1.55;margin:8px 0 10px}
+#detail{margin-top:16px}
+#detail .card{border:2px solid #aebcc5;box-shadow:0 8px 22px rgba(0,0,0,.09);position:relative;padding-top:22px}
+#detail .card::before{content:"선택 포인트 상세정보";display:inline-block;position:absolute;top:-13px;left:16px;background:#17222b;color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700}
+#detail .card h2{margin-top:7px}
+.point-list button.active{outline:3px solid rgba(23,34,43,.14);font-weight:700}
+.point-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 12px}
+.point-list button{border-radius:12px;text-align:left;line-height:1.35;padding:11px 12px}
+@media(max-width:700px){.point-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:430px){.point-list{grid-template-columns:1fr}}
+@media(max-width:600px){.wrap{padding:10px} .hero,.panel,.safety{border-radius:14px;padding:15px} h1{font-size:23px} .actions{grid-template-columns:1fr} .row b{min-width:92px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<h1>서해안 해루질 포인트 MAP</h1>
+<div class="sub">인천부터 전남까지 공개적으로 확인 가능한 포인트를 지역별로 찾아보세요.</div>
+<div class="notice"><b>중요</b> · 이 MAP의 포인트 표시는 자유로운 포획·채취를 보장하지 않습니다. 출조 전 물때·기상·금어기·금지체장·어업권·마을어장·현장 출입/채취 제한을 반드시 확인하세요.</div>
+</section>
+
+<section class="panel">
+<div class="step-title"><b>① 지역 선택</b><span class="guide">(아래 지역을 선택하세요)</span></div>
+<div class="tabs" id="regions"></div>
+<div class="step-title"><b>② 세부지역 선택</b><span class="guide">(아래 세부지역을 선택하세요)</span></div>
+<div class="cities" id="cities"></div>
+<div class="step-title"><b>③ 포인트 선택</b><span class="guide">(아래 포인트 중 선택하세요)</span></div>
+<div class="point-help">선택한 지역의 포인트를 한눈에 확인할 수 있습니다.</div>
+<div id="pointList" class="point-list"></div>
+<div class="legend"><span><i class="dot g"></i>공식·검증 포인트</span><span><i class="dot y"></i>출조자 공개 포인트</span></div>
+<div class="count" id="count"></div>
+<div id="detail"></div>
+</section>
+
+<section class="safety">
+<b>⚠️ 안전은 조과보다 우선입니다</b><br>
+• 간조시간을 종료시간으로 생각하지 마세요.<br>
+• 들물과 퇴출시간을 미리 확인하세요.<br>
+• 갯골·바닷길·암반에서는 특히 주의하세요.<br>
+• 야간에는 혼자 들어가지 않는 것을 권합니다.<br>
+• 가슴장화는 구명장비가 아닙니다.<br>
+• 현장 통제와 관계기관의 최신 안내를 우선하세요.
+</section>
+<div class="small">© 2026 서서연구소 · 서해안 해루질 포인트 MAP<br>
+🟢 공식·검증 포인트는 기존 MASTER와 공공·공식자료로 위치·환경 등을 확인한 포인트입니다. 🟡 출조자 공개 포인트는 공개된 해루질·출조 자료에서 확인한 장소이며 공식 지정 해루질 장소를 의미하지 않습니다. 주요 관심 대상은 참고정보이며 실제 조과를 보장하지 않습니다.</div>
+</div>
+<script>
+const DATA=[{"region": "인천", "city": "중구", "name": "실미도", "class": "green", "basis": "무의도 실미해변·실미도 일대", "env": "갯벌·모래·조간대", "targets": "조개류·게류", "difficulty": "보통", "mapQuery": "인천 중구 실미도", "checked": "2026.09"}, {"region": "인천", "city": "중구", "name": "을왕리", "class": "green", "basis": "을왕리해수욕장 일대", "env": "모래·암반·조간대", "targets": "조개류·고둥류", "difficulty": "보통", "mapQuery": "인천 중구 을왕리", "checked": "2026.09"}, {"region": "인천", "city": "중구", "name": "하나개해변", "class": "yellow", "basis": "무의도 하나개해수욕장", "env": "모래·암반·조간대", "targets": "소라·박하지·바지락·골뱅이", "difficulty": "보통", "mapQuery": "인천 중구 하나개해변", "checked": "2026.09"}, {"region": "인천", "city": "중구", "name": "선녀바위해변", "class": "yellow", "basis": "선녀바위해수욕장", "env": "모래·암반·조간대", "targets": "골뱅이 등 공개 출조자료 참고", "difficulty": "보통", "mapQuery": "인천 중구 선녀바위해변", "checked": "2026.09"}, {"region": "인천", "city": "옹진", "name": "선재도", "class": "green", "basis": "선재도 일대", "env": "갯벌·모래·조간대", "targets": "조개류·게류", "difficulty": "보통", "mapQuery": "인천 옹진 선재도", "checked": "2026.09"}, {"region": "인천", "city": "옹진", "name": "영흥도", "class": "green", "basis": "영흥도 일대", "env": "갯벌·암반·조간대", "targets": "낙지·소라·조개류 등", "difficulty": "주의", "mapQuery": "인천 옹진 영흥도", "checked": "2026.09"}, {"region": "인천", "city": "옹진", "name": "영흥도 십리포", "class": "yellow", "basis": "십리포해수욕장 일대", "env": "모래·암반·조간대", "targets": "소라 등 공개 출조자료 참고", "difficulty": "보통", "mapQuery": "인천 옹진 영흥도 십리포", "checked": "2026.09"}, {"region": "인천", "city": "옹진", "name": "영흥도 장경리", "class": "yellow", "basis": "장경리해수욕장 일대", "env": "모래·갯벌·조간대", "targets": "게류·조개류 등 공개자료 참고", "difficulty": "보통", "mapQuery": "인천 옹진 영흥도 장경리", "checked": "2026.09"}, {"region": "인천", "city": "옹진", "name": "자월도", "class": "yellow", "basis": "자월도 해안 일대", "env": "갯벌·암반·조간대", "targets": "소라 등 공개 출조자료 참고", "difficulty": "주의", "mapQuery": "인천 옹진 자월도", "checked": "2026.09"}, {"region": "경기", "city": "화성", "name": "제부도", "class": "green", "basis": "제부도 해안 일대", "env": "갯벌·모래·암반", "targets": "조개류·게류", "difficulty": "주의", "mapQuery": "경기 화성 제부도", "checked": "2026.09"}, {"region": "경기", "city": "화성", "name": "궁평리·궁평항권", "class": "yellow", "basis": "궁평항·궁평리 해안", "env": "갯벌·모래", "targets": "조개류·게류 등 공개자료 참고", "difficulty": "보통", "mapQuery": "경기 화성 궁평리·궁평항권", "checked": "2026.09"}, {"region": "경기", "city": "안산", "name": "대부도", "class": "green", "basis": "대부도 해안 일대", "env": "갯벌·모래·암반", "targets": "조개류·게류·낙지 등", "difficulty": "보통", "mapQuery": "경기 안산 대부도", "checked": "2026.09"}, {"region": "경기", "city": "안산", "name": "탄도항", "class": "yellow", "basis": "탄도항·누에섬 주변", "env": "갯벌·조간대", "targets": "낙지·바지락·동죽·게류", "difficulty": "보통", "mapQuery": "경기 안산 탄도항", "checked": "2026.09"}, {"region": "경기", "city": "안산", "name": "구봉도", "class": "yellow", "basis": "구봉도 해안 일대", "env": "갯벌·암반·조간대", "targets": "조개류·고둥류 등 공개자료 참고", "difficulty": "주의", "mapQuery": "경기 안산 구봉도", "checked": "2026.09"}, {"region": "충남", "city": "당진", "name": "도비도", "class": "green", "basis": "도비도 선착장·주변 해안", "env": "갯벌·조간대", "targets": "조개류·게류", "difficulty": "보통", "mapQuery": "충남 당진 도비도", "checked": "2026.09"}, {"region": "충남", "city": "당진", "name": "왜목마을", "class": "yellow", "basis": "왜목마을 해안", "env": "모래·암반·조간대", "targets": "소라 등 공개 출조자료 참고", "difficulty": "보통", "mapQuery": "충남 당진 왜목마을", "checked": "2026.09"}, {"region": "충남", "city": "서산", "name": "삼길포항", "class": "yellow", "basis": "삼길포항 주변 해안", "env": "갯벌·암반·조간대", "targets": "소라·낙지·박하지·조개류", "difficulty": "주의", "mapQuery": "충남 서산 삼길포항", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "학암포", "class": "green", "basis": "학암포해변 일대", "env": "모래·갯벌·암반", "targets": "바지락·동죽 등", "difficulty": "보통", "mapQuery": "충남 태안 학암포", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "몽산포", "class": "green", "basis": "몽산포해변 일대", "env": "넓은 갯벌·모래", "targets": "꽃게·낙지·소라·조개류 등", "difficulty": "보통", "mapQuery": "충남 태안 몽산포", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "청포대", "class": "green", "basis": "청포대해변 일대", "env": "갯벌·모래", "targets": "조개류·게류 등", "difficulty": "보통", "mapQuery": "충남 태안 청포대", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "안면도", "class": "green", "basis": "안면도 해안권", "env": "갯벌·모래·암반", "targets": "꽃게·소라·낙지·조개류 등", "difficulty": "보통", "mapQuery": "충남 태안 안면도", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "꽃지해변", "class": "yellow", "basis": "꽃지해수욕장", "env": "모래·암반·조간대", "targets": "소라·박하지·꽃게·바지락", "difficulty": "보통", "mapQuery": "충남 태안 꽃지해변", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "방포해변", "class": "yellow", "basis": "방포해수욕장 일대", "env": "모래·암반·조간대", "targets": "꽃게·소라 등 공개 출조자료 참고", "difficulty": "보통", "mapQuery": "충남 태안 방포해변", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "바람아래해변", "class": "yellow", "basis": "고남면 바람아래해변 일대", "env": "갯벌·모래·조간대", "targets": "꽃게·낙지·조개류 등 공개자료 참고", "difficulty": "보통", "mapQuery": "충남 태안 바람아래해변", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "백사장해변", "class": "yellow", "basis": "백사장항·해변 일대", "env": "모래·갯벌·조간대", "targets": "꽃게·조개류 등 공개자료 참고", "difficulty": "보통", "mapQuery": "충남 태안 백사장해변", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "곰섬", "class": "yellow", "basis": "곰섬해변 일대", "env": "갯벌·모래·암반", "targets": "소라·조개류 등 공개자료 참고", "difficulty": "보통", "mapQuery": "충남 태안 곰섬", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "천리포해변", "class": "yellow", "basis": "천리포해변", "env": "모래·암반·조간대", "targets": "바지락·소라·고둥·맛조개", "difficulty": "보통", "mapQuery": "충남 태안 천리포해변", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "내파수해변", "class": "yellow", "basis": "이원면 내파수리 해안", "env": "갯벌·암반", "targets": "바지락·소라·맛조개·고둥", "difficulty": "보통", "mapQuery": "충남 태안 내파수해변", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "은하해변", "class": "yellow", "basis": "남면 신온리 해안", "env": "갯벌·모래", "targets": "바지락·맛조개·고둥·동죽", "difficulty": "보통", "mapQuery": "충남 태안 은하해변", "checked": "2026.09"}, {"region": "충남", "city": "태안", "name": "신진해변", "class": "yellow", "basis": "근흥면 신진도리 해안", "env": "갯벌·암반", "targets": "바지락·소라·맛조개·고둥", "difficulty": "주의", "mapQuery": "충남 태안 신진해변", "checked": "2026.09"}, {"region": "충남", "city": "보령", "name": "무창포", "class": "green", "basis": "무창포해수욕장 일대", "env": "갯벌·모래·암반", "targets": "바지락·낙지·박하지 등", "difficulty": "보통", "mapQuery": "충남 보령 무창포", "checked": "2026.09"}, {"region": "충남", "city": "서천", "name": "춘장대", "class": "green", "basis": "춘장대해수욕장 일대", "env": "모래·갯벌", "targets": "조개류·동죽·바지락", "difficulty": "보통", "mapQuery": "충남 서천 춘장대", "checked": "2026.09"}, {"region": "전북", "city": "군산", "name": "선유도", "class": "yellow", "basis": "선유도 해안 일대", "env": "모래·갯벌·암반", "targets": "소라·낙지·조개류 등 공개자료 참고", "difficulty": "주의", "mapQuery": "전북 군산 선유도", "checked": "2026.09"}, {"region": "전북", "city": "군산", "name": "신시도", "class": "yellow", "basis": "신시도 해안·갯벌체험장 권역", "env": "갯벌·모래", "targets": "바지락·맛조개·동죽", "difficulty": "보통", "mapQuery": "전북 군산 신시도", "checked": "2026.09"}, {"region": "전북", "city": "군산", "name": "비응도", "class": "yellow", "basis": "비응도 해안 일대", "env": "갯벌·암반", "targets": "바지락·소라·맛조개", "difficulty": "보통", "mapQuery": "전북 군산 비응도", "checked": "2026.09"}, {"region": "전북", "city": "부안", "name": "고사포", "class": "green", "basis": "고사포해수욕장 일대", "env": "모래·갯벌·암반", "targets": "조개류·고둥류", "difficulty": "보통", "mapQuery": "전북 부안 고사포", "checked": "2026.09"}, {"region": "전북", "city": "부안", "name": "하섬", "class": "green", "basis": "하섬·주변 갯벌", "env": "갯벌·암반·바닷길", "targets": "바지락·소라·박하지 등", "difficulty": "주의", "mapQuery": "전북 부안 하섬", "checked": "2026.09"}, {"region": "전북", "city": "부안", "name": "격포", "class": "green", "basis": "격포·채석강 해안권", "env": "암반 조간대·조수웅덩이", "targets": "소라·고둥·해삼 등 공개자료 참고", "difficulty": "주의", "mapQuery": "전북 부안 격포", "checked": "2026.09"}, {"region": "전북", "city": "부안", "name": "변산", "class": "green", "basis": "변산 해안권", "env": "모래·갯벌·암반", "targets": "조개류·게류", "difficulty": "보통", "mapQuery": "전북 부안 변산", "checked": "2026.09"}, {"region": "전북", "city": "부안", "name": "곰소만", "class": "green", "basis": "곰소만 갯벌권", "env": "넓은 갯벌", "targets": "바지락·낙지·조개류", "difficulty": "주의", "mapQuery": "전북 부안 곰소만", "checked": "2026.09"}, {"region": "전북", "city": "부안", "name": "대항·두포 갯벌권", "class": "yellow", "basis": "변산면 대항·두포 일대", "env": "갯벌·모래", "targets": "조개류 중심 체험자료 확인", "difficulty": "보통", "mapQuery": "전북 부안 대항·두포 갯벌권", "checked": "2026.09"}, {"region": "전북", "city": "고창", "name": "구시포해변", "class": "yellow", "basis": "구시포해수욕장", "env": "모래·갯벌", "targets": "백합·바지락·동죽", "difficulty": "보통", "mapQuery": "전북 고창 구시포해변", "checked": "2026.09"}, {"region": "전북", "city": "고창", "name": "동호해변", "class": "yellow", "basis": "동호해수욕장 일대", "env": "모래·갯벌", "targets": "백합·바지락·동죽", "difficulty": "보통", "mapQuery": "전북 고창 동호해변", "checked": "2026.09"}, {"region": "전북", "city": "고창", "name": "만돌·하전 갯벌권", "class": "yellow", "basis": "심원면 만돌·하전 일대", "env": "넓은 갯벌", "targets": "바지락 등 갯벌체험 대상", "difficulty": "보통", "mapQuery": "전북 고창 만돌·하전 갯벌권", "checked": "2026.09"}, {"region": "전남", "city": "영광", "name": "가마미", "class": "green", "basis": "가마미해수욕장 일대", "env": "모래·갯벌·조간대", "targets": "조개류·게류", "difficulty": "보통", "mapQuery": "전남 영광 가마미", "checked": "2026.09"}, {"region": "전남", "city": "영광", "name": "백수해안", "class": "green", "basis": "백수해안도로 아래 해안권", "env": "갯벌·암반", "targets": "바지락·맛조개·고둥·낙지", "difficulty": "주의", "mapQuery": "전남 영광 백수해안", "checked": "2026.09"}, {"region": "전남", "city": "함평", "name": "돌머리", "class": "green", "basis": "돌머리해수욕장·갯벌", "env": "갯벌·모래", "targets": "조개류 등", "difficulty": "보통", "mapQuery": "전남 함평 돌머리", "checked": "2026.09"}, {"region": "전남", "city": "무안", "name": "홀통", "class": "green", "basis": "홀통해변 일대", "env": "갯벌·모래", "targets": "낙지·조개류 등", "difficulty": "보통", "mapQuery": "전남 무안 홀통", "checked": "2026.09"}, {"region": "전남", "city": "무안", "name": "조금나루", "class": "green", "basis": "조금나루 해안 일대", "env": "갯벌·모래", "targets": "낙지·조개류 등", "difficulty": "보통", "mapQuery": "전남 무안 조금나루", "checked": "2026.09"}, {"region": "전남", "city": "무안", "name": "톱머리", "class": "green", "basis": "톱머리해수욕장 일대", "env": "갯벌·모래", "targets": "조개류·낙지 등", "difficulty": "보통", "mapQuery": "전남 무안 톱머리", "checked": "2026.09"}, {"region": "전남", "city": "무안", "name": "도리포", "class": "green", "basis": "도리포항·해안 일대", "env": "갯벌·모래·암반", "targets": "조개류·낙지 등", "difficulty": "보통", "mapQuery": "전남 무안 도리포", "checked": "2026.09"}, {"region": "전남", "city": "무안", "name": "송계어촌체험마을", "class": "yellow", "basis": "해제면 송석리·도리포 인근", "env": "갯벌·모래", "targets": "바지락·소라·낙지·고둥", "difficulty": "보통", "mapQuery": "전남 무안 송계어촌체험마을", "checked": "2026.09"}, {"region": "전남", "city": "무안", "name": "해제 갯벌권", "class": "yellow", "basis": "해제면 갯벌 일대", "env": "넓은 갯벌", "targets": "세발낙지·바지락·동죽·맛조개", "difficulty": "주의", "mapQuery": "전남 무안 해제 갯벌권", "checked": "2026.09"}, {"region": "전남", "city": "신안", "name": "증도·우전권", "class": "yellow", "basis": "증도 우전해변·갯벌권", "env": "넓은 갯벌·모래", "targets": "바지락·낙지·조개류 등", "difficulty": "보통", "mapQuery": "전남 신안 증도·우전권", "checked": "2026.09"}, {"region": "전남", "city": "신안", "name": "암태도 추포해변", "class": "yellow", "basis": "암태면 추포리", "env": "모래·갯벌", "targets": "바지락·맛조개·동죽", "difficulty": "보통", "mapQuery": "전남 신안 암태도 추포해변", "checked": "2026.09"}, {"region": "전남", "city": "신안", "name": "지도 사옥해변", "class": "yellow", "basis": "지도읍 사옥리", "env": "넓은 갯벌", "targets": "바지락·동죽·맛조개·갯고둥", "difficulty": "보통", "mapQuery": "전남 신안 지도 사옥해변", "checked": "2026.09"}, {"region": "전남", "city": "신안", "name": "하황도", "class": "yellow", "basis": "안좌면 하황리 해안", "env": "넓은 갯벌", "targets": "바지락·동죽·맛조개·갯고둥", "difficulty": "주의", "mapQuery": "전남 신안 하황도", "checked": "2026.09"}, {"region": "전남", "city": "신안", "name": "신의도", "class": "yellow", "basis": "신의면 해안권", "env": "갯벌·어촌 해안", "targets": "바지락·낙지·꽃게 등 공개자료 참고", "difficulty": "주의", "mapQuery": "전남 신안 신의도", "checked": "2026.09"}, {"region": "전남", "city": "신안", "name": "하의도 큰길해변", "class": "yellow", "basis": "하의면 대리 해안", "env": "모래갯벌", "targets": "바지락·동죽·맛조개", "difficulty": "주의", "mapQuery": "전남 신안 하의도 큰길해변", "checked": "2026.09"}];
+const regions=["인천","경기","충남","전북","전남"];
+let currentRegion="인천", currentCity="전체";
+
+const regEl=document.getElementById("regions"), cityEl=document.getElementById("cities"), pointListEl=document.getElementById("pointList");
+function button(text, active, fn){const b=document.createElement("button");b.textContent=text;if(active)b.classList.add("active");b.onclick=fn;return b}
+function renderRegions(){
+ regEl.innerHTML="";
+ regions.forEach(r=>regEl.appendChild(button(r,r===currentRegion,()=>{currentRegion=r;currentCity="전체";renderAll()})));
+}
+function renderCities(){
+ cityEl.innerHTML="";
+ const cities=[...new Set(DATA.filter(x=>x.region===currentRegion).map(x=>x.city))];
+ ["전체",...cities].forEach(c=>cityEl.appendChild(button(c,c===currentCity,()=>{currentCity=c;renderAll(false)})));
+}
+function filtered(){
+ return DATA.filter(x=>x.region===currentRegion && (currentCity==="전체"||x.city===currentCity));
+}
+function renderPoints(){
+ const arr=filtered();
+ pointListEl.innerHTML="";
+ document.getElementById("count").textContent=`현재 ${currentRegion} ${currentCity==="전체"?"전체":currentCity} · ${arr.length}개 포인트`;
+
+ arr.forEach(x=>{
+   const label=currentCity==="전체" ? `${x.city} · ${x.name}` : x.name;
+   const b=button(label,false,()=>{
+      [...pointListEl.querySelectorAll("button")].forEach(el=>el.classList.remove("active"));
+      b.classList.add("active");
+      renderDetail(x);
+   });
+   pointListEl.appendChild(b);
+ });
+
+ const green=arr.filter(x=>x.class==="green").length;
+ const yellow=arr.filter(x=>x.class==="yellow").length;
+ const title=currentCity==="전체" ? `${currentRegion} 전체 포인트` : `${currentRegion} ${currentCity} 전체 포인트`;
+ document.getElementById("detail").innerHTML=`
+ <div class="card">
+  <h2>📍 ${title}</h2>
+  <div class="row"><b>포인트 수</b>${arr.length}곳</div>
+  <div class="row"><b>구성</b>🟢 공식·검증 포인트 ${green}곳 · 🟡 출조자 공개 포인트 ${yellow}곳</div>
+  <div class="small">위 포인트 목록에서 원하는 장소를 누르면 이 영역에 해당 포인트의 상세정보가 표시됩니다.</div>
+ </div>`;
+}
+function renderDetail(x){
+ if(!x){document.getElementById("detail").innerHTML="<div class='card'>확인된 포인트가 없습니다.</div>";return}
+ const isG=x.class==="green";
+ const label=isG?"🟢 공식·검증 포인트":"🟡 출조자 공개 포인트";
+ const map="https://map.naver.com/p/search/"+encodeURIComponent(x.mapQuery);
+ const tide="https://www.khoa.go.kr/swtc/main.do";
+ document.getElementById("detail").innerHTML=`
+ <div class="card">
+  <span class="badge ${isG?"green":"yellow"}">${label}</span>
+  <div class="small" style="margin:0 0 4px;font-weight:700">현재 선택한 포인트</div><h2>📍 ${x.name}</h2>
+  <div class="row"><b>지역</b>${x.region} · ${x.city}</div>
+  <div class="row"><b>진입 기준</b>${x.basis}</div>
+  <div class="row"><b>환경</b>${x.env}</div>
+  <div class="row"><b>관심 대상</b>${x.targets}</div>
+  <div class="row"><b>접근 참고</b>${x.difficulty}</div>
+  <div class="row"><b>최근 정리</b>${x.checked}</div>
+  <div class="actions">
+   <a class="btn" href="${map}" target="_blank" rel="noopener">지도에서 위치 확인</a>
+   <a class="btn alt" href="${tide}" target="_blank" rel="noopener">공식 물때 확인</a>
+  </div>
+  <div class="small">
+※ <b>지도에서 위치 확인</b>은 선택한 포인트명을 기준으로 네이버지도에서 검색합니다.<br>
+※ <b>공식 물때 확인</b>은 국립해양조사원 스마트 조석예보로 연결됩니다. 해루질 포인트와 공식 조석예보 지점은 1:1로 존재하지 않을 수 있으므로, 서비스에서 해당 포인트와 가까운 예보지역을 선택해 다시 확인하세요.<br>
+※ 현장 상황·출입로·어업권·채취 제한은 수시로 달라질 수 있습니다. 출조 전 최신 공식 안내를 다시 확인하세요.
+</div>
+ </div>`;
+}
+function renderAll(withRegions=true){renderRegions();renderCities();renderPoints()}
+renderAll();
+</script>
+</body></html>
